@@ -2,14 +2,11 @@ import com.nsu.fit.leonova.BadLexemeException;
 import com.nsu.fit.leonova.Lexeme;
 import com.nsu.fit.leonova.LexemeType;
 import com.nsu.fit.leonova.Lexer;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.StringReader;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
