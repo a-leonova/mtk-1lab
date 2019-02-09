@@ -65,7 +65,7 @@ public class Lexer {
                 number.trimToSize();
                 return lexeme;
             default:
-                throw new BadLexemeException();
+                throw new BadLexemeException("Bad symbol: " + (char)current);
         }
         current = reader.read();
         return lexeme;
