@@ -76,13 +76,23 @@ public class Parser {
         }
     }
 
-
     private int parseAtom() throws BadLexemeException, IOException, BadExpressionException {
-        if(current.getType() != LexemeType.NUMBER){
-            throw new BadExpressionException("Bad expression. Not a number");
+
+        switch (current.getType()){
+            case NUMBER:
+                int i = Integer.parseInt(current.getText());
+                current = lexer.getNextLexeme();
+                return i;
+            case LEFT_BRACE:
+                current = lexer.getNextLexeme();
+                int res = parseExpr();
+                if(current.getType() != LexemeType.RIGHT_BRACE){
+                    throw new BadExpressionException("Wrong braces expression");
+                }
+                current = lexer.getNextLexeme();
+                return res;
+                default:
+                    throw new BadExpressionException("Wrong expression");
         }
-        int i = Integer.parseInt(current.getText());
-        current = lexer.getNextLexeme();
-        return i;
     }
 }

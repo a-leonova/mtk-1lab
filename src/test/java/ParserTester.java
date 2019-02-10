@@ -39,7 +39,7 @@ public class ParserTester {
 
 
     @Test
-    public void checkDifficultExpr() throws IOException, BadLexemeException, BadExpressionException {
+    public void checkExprMinusPlus() throws IOException, BadLexemeException, BadExpressionException {
         StringReader reader = new StringReader("100 + 200 + 5 + 10 - 400");
         Lexer lexer = new Lexer(reader);
 
@@ -70,7 +70,7 @@ public class ParserTester {
     }
 
     @Test
-    public void checkDifficultExprWithPlusMinusMultDiv() throws IOException, BadLexemeException, BadExpressionException {
+    public void checkExprWithPlusMinusMultDiv() throws IOException, BadLexemeException, BadExpressionException {
         StringReader reader = new StringReader("100 / 10 - 25 * 36 / 6 + 2 * 57 - 12");
         Lexer lexer = new Lexer(reader);
 
@@ -100,7 +100,7 @@ public class ParserTester {
     }
 
     @Test
-    public void checkDifficultExprWithPlusMinusMultDivPow() throws IOException, BadLexemeException, BadExpressionException {
+    public void checkExprWithPlusMinusMultDivPow() throws IOException, BadLexemeException, BadExpressionException {
         StringReader reader = new StringReader("2 * 10^4 - 5^2^3 + 1556-1458/2 - 4587");
         Lexer lexer = new Lexer(reader);
 
@@ -120,7 +120,7 @@ public class ParserTester {
     }
 
     @Test
-    public void checkDifficultExprWithPlusMinusMultDivPowUnminus() throws IOException, BadLexemeException, BadExpressionException {
+    public void checkExprWithPlusMinusMultDivPowUnminus() throws IOException, BadLexemeException, BadExpressionException {
         StringReader reader = new StringReader("2 * 10^4 - 5^2^3 + 1556-1458/2 *-4587");
         Lexer lexer = new Lexer(reader);
 
@@ -129,4 +129,63 @@ public class ParserTester {
         assertEquals(2 * 10000 - 15625 + 1556-1458/2 * -4587, res);
     }
 
+    @Test
+    public void checkExprWithPlusMinusMultDivPowUnminusBraces() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("2 * ((10^4 - 5^2^3) * 1556)-(1458/2 *-4587)-(1258-5698/2)");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(2 * ((10000 - 15625) * 1556)-(1458/2 *-4587)-(1258-5698/2), res);
+    }
+
+    @Test
+    public void checkBadBracesLeft() throws IOException {
+        StringReader reader = new StringReader("10+((8)");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        Throwable exception = assertThrows(BadExpressionException.class, parser::calculate);
+        assertEquals("Wrong braces expression", exception.getMessage());
+    }
+    @Test
+
+    public void checkBadBracesRight() throws IOException {
+        StringReader reader = new StringReader("10+(8))");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        Throwable exception = assertThrows(BadExpressionException.class, parser::calculate);
+        assertEquals("Not EOF in the end", exception.getMessage());
+    }
+
+    @Test
+    public void checkWrongExpression() throws IOException {
+        StringReader reader = new StringReader("10+(*8)");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        Throwable exception = assertThrows(BadExpressionException.class, parser::calculate);
+        assertEquals("Wrong expression", exception.getMessage());
+    }
+
+    @Test
+    public void checkWrongBigExpression() throws IOException {
+        StringReader reader = new StringReader("10/5 - 3 *+(8)");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        Throwable exception = assertThrows(BadExpressionException.class, parser::calculate);
+        assertEquals("Wrong expression", exception.getMessage());
+    }
+
+    @Test
+    public void checkGoodExpression() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("10/5 - 3 *-(8)");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(10/5 - 3 *-(8), res);
+    }
 }
