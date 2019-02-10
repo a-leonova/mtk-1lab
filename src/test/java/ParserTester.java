@@ -78,4 +78,55 @@ public class ParserTester {
         int res = parser.calculate();
         assertEquals(100 / 10 - 25 * 36 / 6 + 2 * 57 - 12, res);
     }
+
+    @Test
+    public void checkPow() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("2^10");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(1024, res);
+    }
+
+    @Test
+    public void checkFewPow() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("2^10^2");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(1048576, res);
+    }
+
+    @Test
+    public void checkDifficultExprWithPlusMinusMultDivPow() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("2 * 10^4 - 5^2^3 + 1556-1458/2 - 4587");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(2 * 10000 - 15625 + 1556-1458/2 - 4587, res);
+    }
+
+    @Test
+    public void checkUnMinus() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("-404");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(-404, res);
+    }
+
+    @Test
+    public void checkDifficultExprWithPlusMinusMultDivPowUnminus() throws IOException, BadLexemeException, BadExpressionException {
+        StringReader reader = new StringReader("2 * 10^4 - 5^2^3 + 1556-1458/2 *-4587");
+        Lexer lexer = new Lexer(reader);
+
+        Parser parser = new Parser(lexer);
+        int res = parser.calculate();
+        assertEquals(2 * 10000 - 15625 + 1556-1458/2 * -4587, res);
+    }
+
 }

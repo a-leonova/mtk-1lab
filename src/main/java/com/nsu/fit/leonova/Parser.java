@@ -17,7 +17,6 @@ public class Parser {
         if(current.getType() != LexemeType.EOF){
             throw new BadExpressionException("Not EOF in the end");
         }
-        //Todo: current == EOF
         return res;
     }
 
@@ -43,10 +42,10 @@ public class Parser {
         while(type == LexemeType.MULT || type == LexemeType.DIV){
             current = lexer.getNextLexeme();
             if(type == LexemeType.DIV){
-                temp /= parseTerm();
+                temp /= parseFactor();
             }
             if(type == LexemeType.MULT){
-                temp *= parseTerm();
+                temp *= parseFactor();
             }
             type = current.getType();
         }
@@ -54,6 +53,31 @@ public class Parser {
 
     }
     private int parseFactor() throws BadExpressionException, BadLexemeException, IOException {
+        int temp = parsePower();
+        LexemeType type = current.getType();
+        while(type == LexemeType.POWER){
+            current = lexer.getNextLexeme();
+            temp = (int)Math.pow(temp, parsePower());
+            type = current.getType();
+        }
+        return temp;
+    }
+
+    private int parsePower() throws BadExpressionException, BadLexemeException, IOException {
+        //int temp = parseAtom();
+        LexemeType type = current.getType();
+        if(type == LexemeType.MINUS){
+            current = lexer.getNextLexeme();
+            int temp = -1 * parseAtom();
+            return temp;
+        }
+        else {
+            return parseAtom();
+        }
+    }
+
+
+    private int parseAtom() throws BadLexemeException, IOException, BadExpressionException {
         if(current.getType() != LexemeType.NUMBER){
             throw new BadExpressionException("Bad expression. Not a number");
         }
@@ -61,10 +85,4 @@ public class Parser {
         current = lexer.getNextLexeme();
         return i;
     }
-//    private int parsePower(){
-//
-//    }
-//    private int parseAtom(){
-//
-//    }
 }
